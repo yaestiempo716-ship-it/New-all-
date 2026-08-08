@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CLAUDE.md — guía de uso / 使用指南</title>
+<style>
+/* ---------- tokens: light (bare :root = complete palette) ---------- */
+:root {
+  --bg:        #F2F2EF;
+  --surface:   #FAFAF8;
+  --surface-2: #EAEBE6;
+  --ink:       #14211F;
+  --ink-2:     #4E5C59;
+  --ink-3:     #7C8785;
+  --rule:      #D8D9D3;
+  --rule-soft: #E6E7E1;
+  --accent:    #0F6E63;
+  --accent-2:  #DCEBE7;
+  --good:      #2F6B3A;
+  --good-bg:   #E4EDE3;
+  --bad:       #9B3227;
+  --bad-bg:    #F2E3E0;
+
+  --f-mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --f-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial,
+            "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
+  --f-cjk:  "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Source Han Sans SC", "Microsoft YaHei",
+            -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:        #101514;
+    --surface:   #171D1C;
+    --surface-2: #1E2625;
+    --ink:       #E8EAE7;
+    --ink-2:     #A3AEAB;
+    --ink-3:     #77827F;
+    --rule:      #2A3230;
+    --rule-soft: #212827;
+    --accent:    #4FBFAE;
+    --accent-2:  #16302C;
+    --good:      #6FBF7E;
+    --good-bg:   #17251A;
+    --bad:       #E08072;
+    --bad-bg:    #2A1A17;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:        #101514;
+  --surface:   #171D1C;
+  --surface-2: #1E2625;
+  --ink:       #E8EAE7;
+  --ink-2:     #A3AEAB;
+  --ink-3:     #77827F;
+  --rule:      #2A3230;
+  --rule-soft: #212827;
+  --accent:    #4FBFAE;
+  --accent-2:  #16302C;
+  --good:      #6FBF7E;
+  --good-bg:   #17251A;
+  --bad:       #E08072;
+  --bad-bg:    #2A1A17;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 17px;
+  line-height: 1.6;
+}
+h1, h2, h3, p, ul, ol, figure, pre, table { margin: 0; }
+ul, ol { padding-left: 1.15em; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---------- bilingual pairing ---------- */
+.zh {
+  display: block;
+  font-family: var(--f-cjk);
+  font-size: 0.93em;
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 74rem;
+  margin: 0 auto;
+  padding: 0 1.4rem 5rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.5rem;
+}
+@media (min-width: 1040px) {
+  .shell { grid-template-columns: 14rem minmax(0, 1fr); gap: 4rem; align-items: start; }
+  .toc { position: sticky; top: 2.5rem; }
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  grid-column: 1 / -1;
+  border-bottom: 1px solid var(--rule);
+  padding: 3.5rem 0 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.eyebrow {
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.masthead h1 {
+  font-family: var(--f-mono);
+  font-size: clamp(1.9rem, 5.5vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+.masthead .lede { max-width: 46rem; font-size: 1.06rem; color: var(--ink-2); }
+.masthead .lede .zh { margin-top: 0.35rem; color: var(--ink-3); }
+
+/* ---------- toc ---------- */
+.toc { min-width: 0; }
+.toc nav { display: flex; flex-direction: column; gap: 0.55rem; min-width: 0; }
+.toc .toc-title {
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--rule-soft);
+  margin-bottom: 0.3rem;
+}
+.toc a {
+  font-family: var(--f-mono);
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+.toc a:hover { color: var(--accent); }
+.toc a .zh { font-size: 0.85em; color: var(--ink-3); display: inline; }
+@media (max-width: 1039px) {
+  .toc { border: 1px solid var(--rule); border-radius: 3px; padding: 1rem 1.2rem; background: var(--surface); }
+  .toc nav { flex-direction: row; flex-wrap: wrap; gap: 0.5rem 1.4rem; }
+  .toc .toc-title { flex: 1 0 100%; }
+  .toc a { flex: 0 1 auto; }
+}
+
+/* ---------- sections ---------- */
+main { display: flex; flex-direction: column; gap: 4rem; min-width: 0; }
+main > section { display: flex; flex-direction: column; gap: 1.15rem; scroll-margin-top: 2rem; min-width: 0; }
+main > section > h2 {
+  font-family: var(--f-mono);
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-wrap: balance;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--rule);
+}
+main > section > h2 .zh { font-size: 0.72em; font-weight: 500; margin-top: 0.3rem; letter-spacing: 0; }
+h3 {
+  font-family: var(--f-mono);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+main p, main li { max-width: 68ch; }
+main > section > p { color: var(--ink); }
+strong { font-weight: 600; }
+.dim { color: var(--ink-2); }
+
+/* ---------- inline code + blocks ---------- */
+code {
+  font-family: var(--f-mono);
+  font-size: 0.87em;
+  background: var(--surface-2);
+  border-radius: 3px;
+  padding: 0.1em 0.35em;
+  word-break: break-word;
+}
+pre {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  max-width: 100%;
+}
+pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: var(--ink-2);
+  word-break: normal;
+  white-space: pre;
+}
+.cap {
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+
+/* ---------- cascade: indentation encodes specificity ---------- */
+.cascade { display: flex; flex-direction: column; gap: 0.4rem; }
+.cascade-head {
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.3rem 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--rule-soft);
+}
+.layer {
+  --depth: 0;
+  margin-left: calc(var(--depth) * 1.15rem);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent-2);
+  border-radius: 3px;
+  padding: 0.75rem 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+.layer:last-child { border-left-color: var(--accent); }
+.layer-path {
+  font-family: var(--f-mono);
+  font-size: 0.82rem;
+  color: var(--ink);
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.layer-scope {
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.layer-note { font-size: 0.88rem; color: var(--ink-2); }
+.layer-note .zh { font-size: 0.92em; color: var(--ink-3); margin-top: 0.15rem; }
+@media (max-width: 620px) {
+  .layer { margin-left: calc(var(--depth) * 0.5rem); }
+}
+
+/* ---------- two-column contrast ---------- */
+.split { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+@media (min-width: 760px) { .split { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.panel {
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1.1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-width: 0;
+}
+.panel h3 { font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.panel ul { display: flex; flex-direction: column; gap: 0.6rem; margin: 0; }
+.panel li { font-size: 0.92rem; max-width: none; }
+.panel li .zh { font-size: 0.9em; margin-top: 0.15rem; }
+.panel.yes { background: var(--good-bg); border-color: var(--good); }
+.panel.yes h3 { color: var(--good); }
+.panel.no  { background: var(--bad-bg);  border-color: var(--bad); }
+.panel.no h3 { color: var(--bad); }
+.panel.plain { background: var(--surface); }
+.panel.plain h3 { color: var(--accent); }
+
+/* ---------- rules list ---------- */
+.rules { display: flex; flex-direction: column; gap: 0.9rem; }
+.rule-item {
+  display: grid;
+  grid-template-columns: 1.9rem minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: start;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--rule-soft);
+}
+.rule-item:last-child { border-bottom: 0; padding-bottom: 0; }
+.rule-n {
+  font-family: var(--f-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  color: var(--accent);
+  padding-top: 0.22rem;
+}
+.rule-item p { max-width: 64ch; font-size: 0.95rem; }
+
+/* ---------- callout ---------- */
+.callout {
+  background: var(--accent-2);
+  border-radius: 3px;
+  padding: 1rem 1.2rem;
+  font-size: 0.95rem;
+}
+.callout p { max-width: 64ch; }
+.callout .zh { margin-top: 0.3rem; color: var(--ink-2); }
+
+/* ---------- footer ---------- */
+footer {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--rule);
+  padding-top: 1.4rem;
+  margin-top: 1rem;
+  font-family: var(--f-mono);
+  font-size: 0.74rem;
+  color: var(--ink-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.5rem;
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">Claude Code · memoria de proyecto</div>
+    <h1>CLAUDE.md</h1>
+    <p class="lede">
+      Qué es, cómo se carga, qué escribir dentro y —sobre todo— cuándo <em>no</em> usarlo.
+      <span class="zh" lang="zh-Hans">它是什么、如何被加载、里面该写什么，以及最重要的：什么时候<em>不</em>该用它。</span>
+    </p>
+  </header>
+
+  <aside class="toc">
+    <nav>
+      <div class="toc-title">Índice / 目录</div>
+      <a href="#que-es">Qué es <span class="zh" lang="zh-Hans">· 是什么</span></a>
+      <a href="#jerarquia">Jerarquía de carga <span class="zh" lang="zh-Hans">· 加载层级</span></a>
+      <a href="#imports">Imports <span class="zh" lang="zh-Hans">· 引用</span></a>
+      <a href="#crear">Cómo crearlo <span class="zh" lang="zh-Hans">· 如何创建</span></a>
+      <a href="#porque">Por qué importa <span class="zh" lang="zh-Hans">· 为何重要</span></a>
+      <a href="#contenido">Qué poner y qué no <span class="zh" lang="zh-Hans">· 写与不写</span></a>
+      <a href="#cuando">Cuándo usarlo <span class="zh" lang="zh-Hans">· 何时使用</span></a>
+      <a href="#reglas">Reglas prácticas <span class="zh" lang="zh-Hans">· 实用规则</span></a>
+    </nav>
+  </aside>
+
+  <main>
+
+    <!-- 1 -->
+    <section id="que-es">
+      <h2>Qué es<span class="zh" lang="zh-Hans">CLAUDE.md 是什么</span></h2>
+      <p>
+        Es un archivo de <strong>memoria persistente</strong> que Claude Code carga automáticamente en el
+        contexto <strong>al inicio de cada sesión</strong>, antes de que escribas nada.
+        <span class="zh" lang="zh-Hans">它是一个<strong>持久化记忆</strong>文件。Claude Code 会在<strong>每次会话开始时</strong>自动把它读入上下文——在你输入任何内容之前。</span>
+      </p>
+      <p>
+        No es documentación para humanos: es <strong>instrucción para el agente</strong>. Todo lo que
+        pongas ahí se paga en tokens en <em>cada</em> conversación.
+        <span class="zh" lang="zh-Hans">它不是给人看的文档，而是<strong>给智能体的指令</strong>。你写进去的每一行，都会在<em>每一次</em>对话里消耗 token。</span>
+      </p>
+      <div class="callout">
+        <p>
+          Esa doble naturaleza explica casi todas las decisiones de este documento: es potente porque
+          siempre está presente, y es caro por exactamente la misma razón.
+          <span class="zh" lang="zh-Hans">这种双重性质几乎解释了本文所有的取舍：它之所以强大，是因为它始终在场；而它之所以昂贵，恰恰也是同一个原因。</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section id="jerarquia">
+      <h2>Jerarquía de carga<span class="zh" lang="zh-Hans">加载层级</span></h2>
+      <p>
+        Claude Code busca y concatena varios niveles. La sangría de abajo es literal: cuanto más a la
+        derecha, más específico y más peso tiene sobre lo anterior.
+        <span class="zh" lang="zh-Hans">Claude Code 会查找并拼接多个层级。下面的缩进就是字面意义上的层级——越靠右越具体，对上层的覆盖力也越强。</span>
+      </p>
+
+      <div class="cascade">
+        <div class="cascade-head"><span>General <span lang="zh-Hans">通用</span></span><span>Específico <span lang="zh-Hans">具体</span></span></div>
+
+        <div class="layer" style="--depth: 0">
+          <div class="layer-path">/etc/claude-code/CLAUDE.md</div>
+          <div class="layer-scope">Toda la máquina · 全机器</div>
+          <div class="layer-note">
+            Políticas corporativas, desplegadas por el administrador.
+            <span class="zh" lang="zh-Hans">企业级策略，由管理员统一下发。</span>
+          </div>
+        </div>
+
+        <div class="layer" style="--depth: 1">
+          <div class="layer-path">~/.claude/CLAUDE.md</div>
+          <div class="layer-scope">Todos tus proyectos · 你的所有项目</div>
+          <div class="layer-note">
+            Preferencias personales: idioma de las respuestas, estilo, herramientas que prefieres.
+            <span class="zh" lang="zh-Hans">个人偏好：回复语言、风格、你惯用的工具。</span>
+          </div>
+        </div>
+
+        <div class="layer" style="--depth: 2">
+          <div class="layer-path">&lt;repo&gt;/CLAUDE.md</div>
+          <div class="layer-scope">El proyecto, compartido en git · 项目级，随 git 共享</div>
+          <div class="layer-note">
+            El importante. Comandos, arquitectura y convenciones del equipo. <strong>Se commitea.</strong>
+            <span class="zh" lang="zh-Hans">最关键的一个。团队的命令、架构与约定。<strong>要提交进版本库。</strong></span>
+          </div>
+        </div>
+
+        <div class="layer" style="--depth: 3">
+          <div class="layer-path">&lt;repo&gt;/CLAUDE.local.md</div>
+          <div class="layer-scope">El proyecto, solo tú · 项目级，仅本人</div>
+          <div class="layer-note">
+            Rutas locales y ajustes de tu máquina; va al <code>.gitignore</code>. En desuso: hoy es
+            preferible el archivo de <code>~/.claude/</code>.
+            <span class="zh" lang="zh-Hans">本机路径和个人设置，需加入 <code>.gitignore</code>。已不推荐：现在更建议放在 <code>~/.claude/</code> 里。</span>
+          </div>
+        </div>
+
+        <div class="layer" style="--depth: 4">
+          <div class="layer-path">&lt;repo&gt;/apps/web/CLAUDE.md</div>
+          <div class="layer-scope">Un subdirectorio · 子目录级</div>
+          <div class="layer-note">
+            Reglas de un paquete concreto dentro de un monorepo.
+            <span class="zh" lang="zh-Hans">monorepo 中某个具体子包的规则。</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Dos detalles que cambian cómo lo organizas<span class="zh" lang="zh-Hans">两个会影响你组织方式的细节</span></h3>
+      <ul>
+        <li>
+          <strong>Recursión hacia arriba.</strong> Si trabajas en <code>/repo/apps/web/</code>, se carga
+          <code>/repo/CLAUDE.md</code> <em>y</em> <code>/repo/apps/web/CLAUDE.md</code>. No se sustituyen: se suman.
+          <span class="zh" lang="zh-Hans"><strong>向上递归。</strong>如果你在 <code>/repo/apps/web/</code> 下工作，<code>/repo/CLAUDE.md</code> <em>和</em> <code>/repo/apps/web/CLAUDE.md</code> 都会被加载。它们是叠加关系，不是替换关系。</span>
+        </li>
+        <li>
+          <strong>Carga bajo demanda.</strong> Los de subdirectorio no entran al arrancar, sino cuando
+          tocas archivos de esa carpeta. Por eso un monorepo puede tener muchos sin inflar cada sesión.
+          <span class="zh" lang="zh-Hans"><strong>按需加载。</strong>子目录的文件不会在启动时载入，而是在你实际操作该目录下的文件时才载入。所以 monorepo 可以放很多个，而不会让每次会话都变臃肿。</span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 3 -->
+    <section id="imports">
+      <h2>Imports<span class="zh" lang="zh-Hans">用 @ 引用其他文件</span></h2>
+      <p>
+        Con <code>@ruta/archivo.md</code> incluyes otro archivo. Sirve para mantener el
+        <code>CLAUDE.md</code> corto y dejar el detalle en documentos que solo se leen cuando hacen falta.
+        <span class="zh" lang="zh-Hans">用 <code>@路径/文件.md</code> 可以引入另一个文件。这样能让 <code>CLAUDE.md</code> 保持简短，把细节留在真正需要时才读的文档里。</span>
+      </p>
+<pre><code># Proyecto X
+
+Comandos y convenciones: ver abajo.
+Arquitectura detallada en @docs/architecture.md
+Guía de estilo del API en @docs/api-style.md</code></pre>
+    </section>
+
+    <!-- 4 -->
+    <section id="crear">
+      <h2>Cómo crearlo y editarlo<span class="zh" lang="zh-Hans">如何创建与编辑</span></h2>
+      <div class="split">
+        <div class="panel plain">
+          <h3>/init</h3>
+          <p style="font-size:0.92rem">
+            Genera uno analizando el codebase. Buen punto de partida — pero luego <strong>hay que podarlo</strong>.
+            <span class="zh" lang="zh-Hans">通过分析代码库自动生成一份。是不错的起点——但之后<strong>必须精简</strong>。</span>
+          </p>
+        </div>
+        <div class="panel plain">
+          <h3># al inicio del mensaje</h3>
+          <p style="font-size:0.92rem">
+            Añade esa línea a la memoria sin salir de la sesión. Ej: <code># usa pnpm, nunca npm</code>.
+            <span class="zh" lang="zh-Hans">无需离开当前会话即可把这一行写入记忆。例如：<code># 用 pnpm，不要用 npm</code>。</span>
+          </p>
+        </div>
+        <div class="panel plain">
+          <h3>/memory</h3>
+          <p style="font-size:0.92rem">
+            Abre los archivos de memoria en tu editor para revisarlos y limpiarlos a fondo.
+            <span class="zh" lang="zh-Hans">在编辑器中打开各层记忆文件，便于通读和彻底整理。</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section id="porque">
+      <h2>Por qué importa<span class="zh" lang="zh-Hans">为何重要</span></h2>
+      <p>
+        Sin <code>CLAUDE.md</code>, Claude <strong>redescubre tu proyecto en cada sesión</strong>: lee el
+        <code>package.json</code>, adivina el gestor de paquetes, prueba <code>npm test</code> cuando en
+        realidad usas <code>make test</code>, y reinventa un patrón que tú ya tenías resuelto.
+        <span class="zh" lang="zh-Hans">没有 <code>CLAUDE.md</code>，Claude 会在<strong>每次会话里重新摸索你的项目</strong>：读 <code>package.json</code>、猜包管理器、执行 <code>npm test</code>——而你其实用的是 <code>make test</code>——并重新发明一个你早已解决过的模式。</span>
+      </p>
+      <p>
+        El valor real no es «ahorrar explicaciones». Es <strong>eliminar la clase de errores que se
+        repiten</strong>.
+        <span class="zh" lang="zh-Hans">它真正的价值不是「少解释几句」，而是<strong>消除那一类反复出现的错误</strong>。</span>
+      </p>
+      <div class="callout">
+        <p>
+          <strong>Regla de las tres veces:</strong> si has tenido que corregir lo mismo tres veces,
+          esa corrección ya no pertenece al chat — pertenece al <code>CLAUDE.md</code>.
+          <span class="zh" lang="zh-Hans"><strong>「三次法则」：</strong>同一件事你纠正了三遍，那它就不该再留在对话里——它属于 <code>CLAUDE.md</code>。</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section id="contenido">
+      <h2>Qué poner y qué no<span class="zh" lang="zh-Hans">该写什么，不该写什么</span></h2>
+      <p>
+        El criterio, en una pregunta: <strong>¿un desarrollador nuevo, competente pero sin contexto, se
+        equivocaría sin esto?</strong> Si la respuesta es sí, va dentro.
+        <span class="zh" lang="zh-Hans">判断标准就一句话：<strong>一个能力不差、但对项目毫无背景的新同事，如果不知道这条，会不会犯错？</strong>会，就写进去。</span>
+      </p>
+
+      <div class="split">
+        <div class="panel yes">
+          <h3>Sí / 该写</h3>
+          <ul>
+            <li>Comandos reales de build, test y lint — sobre todo los que no son el default.
+              <span class="zh" lang="zh-Hans">真实的构建、测试、lint 命令——尤其是与默认约定不同的那些。</span></li>
+            <li>Convenciones que difieren del ecosistema (gestor de paquetes, estilo, patrones prohibidos).
+              <span class="zh" lang="zh-Hans">与生态默认做法不同的约定（包管理器、代码风格、禁用模式）。</span></li>
+            <li>Límites de arquitectura: qué módulo no puede importar a cuál.
+              <span class="zh" lang="zh-Hans">架构边界：哪个模块不能依赖哪个模块。</span></li>
+            <li>Trampas conocidas: cosas que parecen rotas y no lo están.
+              <span class="zh" lang="zh-Hans">已知的坑：那些看起来像故障、其实正常的情况。</span></li>
+          </ul>
+        </div>
+        <div class="panel no">
+          <h3>No / 不该写</h3>
+          <ul>
+            <li>Explicaciones de lo que el código ya dice. Claude sabe leer.
+              <span class="zh" lang="zh-Hans">代码本身已经说明的内容。Claude 会读代码。</span></li>
+            <li>Documentación para humanos. Eso es el <code>README.md</code>: otro público, otro propósito.
+              <span class="zh" lang="zh-Hans">面向人的文档。那是 <code>README.md</code> 的事：受众不同，目的也不同。</span></li>
+            <li>Consejos genéricos («escribe código limpio»). Ruido sin efecto.
+              <span class="zh" lang="zh-Hans">泛泛的建议（「写干净的代码」）。只是噪音，毫无作用。</span></li>
+            <li><strong>Secretos.</strong> Este archivo va a git y entra en el contexto del modelo.
+              <span class="zh" lang="zh-Hans"><strong>密钥。</strong>这个文件会进版本库，也会进入模型上下文。</span></li>
+            <li>Contenido que caduca (roadmaps, estado del sprint): luego da instrucciones falsas.
+              <span class="zh" lang="zh-Hans">会过期的内容（路线图、迭代状态）：过后就变成了错误指令。</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="cap">Ejemplo de contenido que sí gana su sitio / 值得占位的内容示例</p>
+<pre><code>## Comandos
+- Tests: `make test` (NO `npm test`, está roto)
+- Un solo test: `pytest tests/x.py::test_y -x`
+- Lint antes de commit: `./scripts/check.sh`
+
+## Convenciones
+- Gestor de paquetes: pnpm. Nunca npm ni yarn.
+- No usar `any` en TypeScript; preferimos `unknown` + narrowing.
+- Migraciones: nunca editar una existente, crear una nueva.
+
+## Arquitectura
+- `src/core/` no puede importar de `src/ui/` (dependencia unidireccional).
+- La auth vive en `src/auth/`; todo pasa por `verifySession()`.
+
+## Trampas conocidas
+- El servidor de dev tarda ~40s en arrancar, no lo mates antes.
+- Los tests de `integration/` necesitan Docker levantado.</code></pre>
+
+      <p>
+        Y un aviso sobre el tamaño: un <code>CLAUDE.md</code> de 800 líneas <strong>se diluye</strong>.
+        Las instrucciones importantes acaban compitiendo con las triviales, y el modelo empieza a ignorarlas.
+        <span class="zh" lang="zh-Hans">另外关于篇幅：一份 800 行的 <code>CLAUDE.md</code> 会被<strong>稀释</strong>。重要指令最终与琐碎内容争夺注意力，模型也就开始忽略它们了。</span>
+      </p>
+    </section>
+
+    <!-- 7 -->
+    <section id="cuando">
+      <h2>Cuándo usarlo y cuándo no<span class="zh" lang="zh-Hans">何时该用，何时不必</span></h2>
+      <div class="split">
+        <div class="panel yes">
+          <h3>Vale la pena / 值得写</h3>
+          <ul>
+            <li>Proyecto al que vas a volver.
+              <span class="zh" lang="zh-Hans">你还会反复回来的项目。</span></li>
+            <li>El build o los tests tienen pasos no obvios.
+              <span class="zh" lang="zh-Hans">构建或测试有不显而易见的步骤。</span></li>
+            <li>Hay convenciones distintas del default del ecosistema.
+              <span class="zh" lang="zh-Hans">存在与生态默认不同的约定。</span></li>
+            <li>Trabajas en equipo y quieres código consistente para todos — por eso el del repo se commitea.
+              <span class="zh" lang="zh-Hans">团队协作，希望所有人得到一致的产出——这正是仓库里那份要提交的原因。</span></li>
+            <li>Monorepo: uno raíz corto + uno por paquete con lo específico.
+              <span class="zh" lang="zh-Hans">monorepo：根目录放一份精简的，每个子包再放各自的。</span></li>
+          </ul>
+        </div>
+        <div class="panel no">
+          <h3>No hace falta / 不必写</h3>
+          <ul>
+            <li>Script de un solo uso o exploración de una tarde.
+              <span class="zh" lang="zh-Hans">一次性脚本，或一个下午的探索。</span></li>
+            <li>Proyecto convencional donde los defaults funcionan.
+              <span class="zh" lang="zh-Hans">完全常规的项目，默认约定就能跑通。</span></li>
+            <li>Instrucción para <em>esta</em> tarea concreta: dila en el prompt, no en la memoria.
+              <span class="zh" lang="zh-Hans">只针对<em>当前这一个</em>任务的要求：在对话里说就行，不必写进记忆。</span></li>
+            <li>Un repo que solo lees y no modificas.
+              <span class="zh" lang="zh-Hans">只读、不改动的仓库。</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 -->
+    <section id="reglas">
+      <h2>Reglas prácticas<span class="zh" lang="zh-Hans">实用规则</span></h2>
+      <div class="rules">
+        <div class="rule-item">
+          <div class="rule-n">01</div>
+          <p><strong>Corto y en imperativo.</strong> Bullets, no prosa. «Usa X», no «en este proyecto tendemos a preferir X porque…».
+            <span class="zh" lang="zh-Hans"><strong>简短、用祈使句。</strong>写要点，不写散文。用「使用 X」，而不是「本项目中我们倾向于偏好 X，因为……」。</span></p>
+        </div>
+        <div class="rule-item">
+          <div class="rule-n">02</div>
+          <p><strong>Empieza vacío y añade cuando algo falle</strong>, no anticipando fallos imaginarios.
+            <span class="zh" lang="zh-Hans"><strong>从空文件开始，出问题时再补一条</strong>，不要预先设想那些还没发生的问题。</span></p>
+        </div>
+        <div class="rule-item">
+          <div class="rule-n">03</div>
+          <p><strong>Marca solo lo crítico.</strong> <code>IMPORTANTE:</code> o <code>NUNCA:</code> en las dos o tres reglas que de verdad no pueden romperse. Si marcas todo como importante, nada lo es.
+            <span class="zh" lang="zh-Hans"><strong>只标注真正关键的。</strong>用 <code>重要：</code> 或 <code>绝不：</code> 标注那两三条绝不能破的规则。全都标成重要，就等于没有重要。</span></p>
+        </div>
+        <div class="rule-item">
+          <div class="rule-n">04</div>
+          <p><strong>Revísalo cuando el proyecto cambie.</strong> Una instrucción obsoleta hace daño activo: Claude la seguirá con confianza.
+            <span class="zh" lang="zh-Hans"><strong>项目变了就回头修订。</strong>过时的指令是有害的：Claude 会毫不犹豫地照做。</span></p>
+        </div>
+        <div class="rule-item">
+          <div class="rule-n">05</div>
+          <p><strong>Objetivo de tamaño: que quepa en una pantalla.</strong> Si crece, mueve el detalle a otros archivos y usa <code>@import</code>.
+            <span class="zh" lang="zh-Hans"><strong>篇幅目标：一屏放得下。</strong>如果变长了，把细节移到别的文件，用 <code>@</code> 引用。</span></p>
+        </div>
+      </div>
+
+      <p class="cap">Ejemplo mínimo real / 一份真实的最小示例</p>
+<pre><code># api-service
+
+## Comandos
+- Dev: `docker compose up` (requiere .env, ver .env.example)
+- Test: `pytest` — un test: `pytest path::name -x`
+- Lint: `ruff check . && mypy .` — obligatorio antes de commit
+
+## Reglas
+- Python 3.12, gestor: uv. NUNCA pip install directo.
+- IMPORTANTE: no editar `migrations/` existentes,
+  crear nuevas con `alembic revision`.
+- Endpoints nuevos -> anadir test en `tests/api/`.
+- Errores: usar `AppError` de `src/errors.py`, no raise generico.</code></pre>
+
+      <p>
+        Eso, en unas quince líneas, evita más errores repetidos que trescientas líneas describiendo la
+        arquitectura.
+        <span class="zh" lang="zh-Hans">这短短十五行，比三百行的架构描述更能避免重复出错。</span>
+      </p>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>CLAUDE.md — guía de uso / 使用指南</span>
+    <span>Claude Code</span>
+  </footer>
+
+</div>
+</body>
+</html>
