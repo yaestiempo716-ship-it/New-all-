@@ -1,0 +1,15 @@
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+.DS_Store
+
+# secrets — never commit
+.env
+.env*.local
+.env.production
+*.pem
+service-account*.json

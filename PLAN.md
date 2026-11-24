@@ -1,5 +1,8 @@
 # PLAN — Lottery Website (Vercel + Google Sheets)
 
+> **Status:** Phases 0–6 are built and tested (see `README.md`). Remaining: Phase 7 — the owner connects Google + Vercel (README steps 2–4).
+> Stack changed slightly from the first draft: Next.js 16 and plain CSS instead of Tailwind/Framer Motion (fewer moving parts).
+
 ## 1. Do you need a lot of agents?
 **No.** This is a small, well-defined app. Use **one main Claude Code session** that builds it phase by phase, following `CLAUDE.md`. More agents = more cost and more chances of inconsistent code.
 

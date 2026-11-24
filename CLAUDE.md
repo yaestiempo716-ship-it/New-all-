@@ -1,98 +1,74 @@
 # CLAUDE.md — Lottery Number Picker ("Rifa")
 
 ## What this project is
-A mobile-first website where people choose a lottery/raffle number (e.g. 00–99 or 1–100), type their name, and the number becomes **taken for everyone**. The owner sells tickets by sharing one link. **Google Sheets is the database**, with two-way sync: website → sheet, and sheet → website.
+A mobile-first website where people choose a raffle number, type their name, and the number becomes **taken for everyone**. The owner sells tickets by sharing one link. **Google Sheets is the database**, with two-way sync: website → sheet (on reserve), sheet → website (polling ~10 s).
+
+The owner is not a developer: explain manual steps (Google Cloud, Vercel) as short numbered steps, and keep `README.md` up to date.
 
 ## Stack (do not change without asking)
-- **Next.js (App Router) + TypeScript** — deployed on **Vercel**
-- **Tailwind CSS** (+ shadcn/ui only if needed), **Framer Motion** for small animations
-- **Google Sheets API** via the `googleapis` package, using a **Service Account**
-- **SWR** for client polling, **Zod** for validation
-- Package manager: `npm`
+- **Next.js 16 (App Router) + React 19 + TypeScript (strict)** — deployed on **Vercel**
+- **Plain CSS** in `app/globals.css` (CSS variables at `:root`). No Tailwind / UI kits unless asked.
+- **`@googleapis/sheets`** with a **Service Account** (JWT)
+- **SWR** for client polling, **Zod 4** for validation, **Vitest** for tests
+- Package manager: `npm`, Node ≥ 22
+
+## Where things live
+```
+lib/config.ts        ✏️ ALL raffle settings (title, prize, price, range, WhatsApp, language). Owner edits only this.
+lib/sheets.ts        ALL Google Sheets access (google store + in-memory demo store, per-number lock, cache)
+lib/validation.ts    Zod schemas (reserve, admin update, login)
+lib/format.ts        maskName, cleanText, parseStatus (EN/ES status aliases), nowStamp
+lib/auth.ts          admin password check + HMAC-signed httpOnly session cookie
+lib/rate-limit.ts    in-memory per-IP limiter
+lib/api.ts           JSON helpers, error → friendly response, same-origin check
+lib/i18n.ts          ES/EN strings for the public page (admin is English)
+components/RaffleApp.tsx   public page (grid, dialog, toast, confetti)
+components/AdminApp.tsx    /admin dashboard
+app/api/tickets      GET public list (masked names only)
+app/api/reserve      POST reserve
+app/api/admin/*      login, logout, tickets (full data), update, setup
+app/opengraph-image.tsx    WhatsApp/social preview image
+tests/               Vitest (Google client faked in tests/sheets.test.ts)
+```
 
 ## Google Sheet contract (source of truth)
-Sheet tab name: `Tickets`. Row 1 = headers. One row per number.
+Tab `raffle.sheetTab` (default `Tickets`). Row 1 = headers. One row per number (rows can be in any order).
 
-| A: number | B: name | C: phone (optional) | D: status | E: reserved_at | F: note |
+| A: number | B: name | C: phone | D: status | E: reserved_at | F: note |
 |---|---|---|---|---|---|
 
-- `status` ∈ `available` | `reserved` | `paid`  (empty `name` + empty status = available)
-- The owner may edit the sheet by hand at any time (mark paid, free a number, rename). The site must reflect it within ~10 seconds.
-- Never reorder, delete, or rewrite rows/columns the app does not own. Only write to the single row for the chosen number.
+- `status`: `available` | `reserved` | `paid` (also accepts ES: disponible/reservado/pagado, any case). Blank status + a name = reserved.
+- The app writes **only columns B–E of the single row** it changes, with `valueInputOption: "RAW"` (no formula execution). Column F is the owner's.
+- Missing rows are appended; `/admin` → "Set up sheet" creates the tab, headers and missing numbers (idempotent).
+- Never reorder/delete rows or change columns without asking.
 
 ## Environment variables (Vercel + `.env.local`; NEVER commit)
 ```
 GOOGLE_SERVICE_ACCOUNT_EMAIL=
-GOOGLE_PRIVATE_KEY=          # keep \n escapes; replace with real newlines in code
+GOOGLE_PRIVATE_KEY=     # \n escapes are converted in lib/sheets.ts (privateKeyFromEnv)
 GOOGLE_SHEET_ID=
-ADMIN_PASSWORD=
+ADMIN_PASSWORD=         # in dev only, "admin" works when empty; in production admin is disabled when empty
 ```
-Always keep `.env*` in `.gitignore`. Provide `.env.example` with empty values.
+If the Google vars are missing the app runs in **demo mode** (in-memory, banner in /admin).
 
-## Hard rules (the site must be bulletproof)
-1. **No double-booking.** Reserve = re-read the row immediately before writing; write only if still available; return `409` with a friendly message if taken. Use a single conditional update, never trust client state.
-2. **Server-only secrets.** Google credentials are used only in `app/api/*` route handlers / server code. Nothing sensitive reaches the browser.
-3. **Validate everything** with Zod: number in range, name 2–40 chars, trimmed, strip control chars, block formula injection (cell values starting with `= + - @` get a leading `'`).
-4. **Rate-limit** the reserve endpoint (per IP) and add a hidden honeypot field to stop bots.
-5. **Respect Sheets quota** (~60 reads/min/user): cache the sheet read server-side for 5–10 s (`unstable_cache`/in-memory with TTL) and poll from the client every 10 s with SWR; also refetch on tab focus.
-6. **Privacy:** the public API returns only `number`, `status`, and a **masked name** (e.g. "Maria G.") — never phone or notes. Full data only in `/admin`.
-7. **Never leave the UI lying:** optimistic UI is allowed, but must roll back on error.
-8. Handle errors gracefully: sheet down, quota hit, network lost → friendly message + retry, never a blank page.
-
-## Features
-**Public (`/`)**
-- Header with raffle title, prize, draw date, price per number, progress bar ("37/100 taken").
-- Grid of numbers: available (clickable), reserved, paid/taken (disabled, shows masked name on tap/hover).
-- Tap number → modal/bottom sheet: selected number, name input (+ optional phone), confirm button, success confetti, clear error states.
-- Search/jump to a number, filter "available only".
-- Shareable link with nice OG image/preview (WhatsApp/Instagram look good).
-
-**Admin (`/admin`, password-protected, cookie session via signed httpOnly cookie)**
-- Full table, mark paid / free number / edit name, export CSV, "Draw winner" random picker among paid numbers (with animation).
-- Link to open the Google Sheet.
-
-## Design direction
-- Premium, festive-but-clean look: dark or warm-gold accent theme, large rounded tiles, soft shadows, subtle glow on available numbers, smooth micro-animations.
-- **Mobile-first** (most users open it from WhatsApp). Touch targets ≥ 44px. Works at 360px width.
-- Accessible: contrast AA, focus rings, `aria-label` on each number ("Number 17, available"), keyboard navigable, `prefers-reduced-motion` respected.
-- Language: Spanish and English toggle (default Spanish) unless told otherwise. All strings in one `lib/i18n.ts`.
-- Lighthouse target: Performance ≥ 90, Accessibility ≥ 95.
-
-## Project structure
-```
-app/
-  page.tsx                  # public grid
-  admin/page.tsx            # admin
-  api/tickets/route.ts      # GET list (masked)
-  api/reserve/route.ts      # POST reserve
-  api/admin/*/route.ts      # login, mark paid, free, draw
-components/                 # NumberGrid, NumberTile, ReserveModal, ProgressBar, ...
-lib/sheets.ts               # ALL Google Sheets access lives here only
-lib/validation.ts           # Zod schemas
-lib/rate-limit.ts
-lib/i18n.ts
-lib/config.ts               # raffle title, price, range, date (single place to edit)
-```
-
-## Code conventions
-- TypeScript strict, no `any`. Small components, server logic in `lib/`.
-- Every API route: validate input → do work → typed JSON response `{ ok, data?, error? }`.
-- Config (range, price, title, prize) lives in `lib/config.ts`, not hardcoded in components.
-- Write unit tests (Vitest) for `lib/sheets.ts` logic with the Google client mocked, validation, and masking. Add one Playwright test: pick a number → it appears taken after reload.
-- Commit small, meaningful commits. Run `npm run lint && npm run typecheck && npm test` before saying "done".
+## Hard rules
+1. **No double-booking.** Reserve = per-number lock → fresh read (bypass cache) → write only if available → `409 TAKEN`. Never trust client state.
+2. **Server-only secrets.** `lib/sheets.ts`, `lib/auth.ts`, `lib/api.ts` import `server-only`. Nothing sensitive in client bundles.
+3. **Validate everything** with Zod; clean text with `cleanText`; cap sizes (`readJson` 4 KB).
+4. **Abuse protection:** rate limits (reserve 6/min + 30/h per IP, login 8/15 min), honeypot field `website`, same-origin check on POSTs.
+5. **Sheets quota:** 5 s server cache + shared in-flight read; client polls every `raffle.refreshMs` and on focus.
+6. **Privacy:** public API returns only `number`, `status`, masked name. Phones/notes only via `/api/admin/*` (session checked server-side in each route).
+7. Optimistic UI must roll back (re-fetch) on error. Friendly errors, never a blank page.
+8. Accessibility: aria-labels on tiles, focus rings, Esc closes dialog, `prefers-reduced-motion`, works at 360 px.
 
 ## Workflow rules for Claude
-- Plan first for any change touching more than 2 files; show the plan, then implement.
-- Do one phase at a time (see `PLAN.md`); stop at the end of each phase and report what works + how to verify.
-- Ask me before: adding paid services, changing the sheet columns, adding dependencies that are not listed above, or deploying.
-- Never print or commit secrets. If a secret is needed, tell me the exact step to set it in Vercel.
-- Explain anything I must do manually (Google Cloud, Vercel dashboard) as numbered steps for a non-developer.
+- Plan first for changes touching more than 2 files; then implement.
+- Before saying "done": `npm run lint && npm run typecheck && npm test && npm run build` must pass. For UI changes, also check the page in Playwright at 390 px and 1280 px.
+- Ask before: adding dependencies, paid services, changing sheet columns, or deploying/pushing to the production branch.
+- Never print or commit secrets. If one is needed, tell the owner exactly where to set it in Vercel.
+- Update `README.md` when behavior or setup changes.
 
 ## Commands
 ```
-npm run dev        # local
-npm run build      # production build
-npm run lint
-npm run typecheck
-npm test
+npm run dev | build | start | lint | typecheck | test
 ```
