@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rifa — Website Preview</title>
+<style>
+:root{--bg:#0b0b14;--bg2:#13132a;--card:#1a1a35;--line:#2a2a4d;--text:#f3f1ff;--mute:#9a98c0;--gold:#ffc83d;--gold2:#ff9f1c;--green:#2ee59d;--red:#ff5d73;--blue:#5aa9ff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(1200px 600px at 50% -10%,#2b1f5c 0,transparent 60%),var(--bg);color:var(--text);min-height:100vh}
+.top{max-width:1100px;margin:0 auto;padding:20px 16px 0}
+.top h1{font-size:15px;color:var(--mute);font-weight:600;letter-spacing:.04em}
+.tabs{display:flex;gap:8px;margin:14px 0 22px;flex-wrap:wrap}
+.tab{padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:var(--bg2);color:var(--mute);cursor:pointer;font-weight:600;font-size:14px}
+.tab.on{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#2a1c00;border-color:transparent}
+.view{display:none;max-width:1100px;margin:0 auto;padding:0 16px 60px}.view.on{display:block}
+.note{color:var(--mute);font-size:13px;margin-bottom:16px;line-height:1.5}
+.note b{color:var(--gold)}
+/* phone */
+.stage{display:flex;gap:32px;justify-content:center;align-items:flex-start;flex-wrap:wrap}
+.phone{width:390px;max-width:100%;background:var(--bg);border:10px solid #000;border-radius:44px;overflow:hidden;position:relative;box-shadow:0 30px 80px #000a,0 0 0 2px #333;height:780px;display:flex;flex-direction:column}
+.screen{overflow-y:auto;flex:1;scrollbar-width:none}.screen::-webkit-scrollbar{display:none}
+.hero{padding:26px 20px 18px;text-align:center;background:radial-gradient(400px 220px at 50% 0,#4a2f9a66,transparent 70%)}
+.badge{display:inline-block;padding:5px 12px;border-radius:999px;background:#ffc83d22;color:var(--gold);font-size:12px;font-weight:700;letter-spacing:.06em;border:1px solid #ffc83d55}
+.hero h2{font-size:30px;line-height:1.1;margin:12px 0 6px;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--mute);font-size:14px}
+.facts{display:flex;gap:8px;margin:16px 0 0}
+.fact{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 6px}
+.fact small{display:block;color:var(--mute);font-size:11px}.fact b{font-size:16px}
+.prog{padding:4px 20px 14px}
+.prog .row{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);margin-bottom:6px}
+.bar{height:10px;background:var(--card);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--gold));border-radius:99px;transition:width .6s}
+.tools{display:flex;gap:8px;padding:0 20px 12px;align-items:center}
+.tools input[type=search]{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 12px;color:var(--text);font-size:14px;min-width:0}
+.chip{padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--mute);font-size:13px;cursor:pointer;white-space:nowrap}
+.chip.on{color:var(--gold);border-color:var(--gold)}
+.legend{display:flex;gap:14px;padding:0 20px 10px;font-size:12px;color:var(--mute)}
+.legend span:before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.l-a:before{background:var(--card);border:1px solid var(--gold)}.l-r:before{background:#ff9f1c55}.l-p:before{background:#2ee59d55}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:0 20px 20px}
+.n{aspect-ratio:1;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--text);font-weight:700;font-size:16px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:.15s;position:relative;font-family:inherit}
+.n.a{border-color:#ffc83d66;box-shadow:inset 0 0 14px #ffc83d14}
+.n.a:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 0 18px #ffc83d55;border-color:var(--gold)}
+.n.r{background:#ff9f1c22;border-color:#ff9f1c55;color:#ffb85a;cursor:not-allowed}
+.n.p{background:#2ee59d1f;border-color:#2ee59d55;color:var(--green);cursor:not-allowed}
+.n em{font-style:normal;font-size:9px;font-weight:600;opacity:.85;max-width:90%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.n.pop{animation:pop .5s}
+@keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+.steps{padding:6px 20px 24px}
+.steps h3{font-size:16px;margin-bottom:10px}
+.step{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px;font-size:14px}
+.step b{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#2a1c00;display:grid;place-items:center;flex:none}
+.foot{text-align:center;color:var(--mute);font-size:12px;padding:0 20px 90px}
+.cta{position:absolute;left:16px;right:16px;bottom:16px;padding:15px;border:0;border-radius:16px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#2a1c00;font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 10px 30px #ff9f1c55}
+/* modal */
+.sheet{position:absolute;inset:0;background:#000a;display:none;align-items:flex-end;z-index:5}.sheet.on{display:flex}
+.panel{width:100%;background:var(--bg2);border-radius:26px 26px 0 0;padding:22px 20px 26px;border-top:1px solid var(--line);animation:up .25s}
+@keyframes up{from{transform:translateY(60px);opacity:0}}
+.panel .big{font-size:56px;font-weight:900;text-align:center;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.panel label{font-size:12px;color:var(--mute);display:block;margin:12px 0 5px}
+.panel input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;color:var(--text);font-size:16px}
+.panel input:focus{outline:2px solid var(--gold);border-color:transparent}
+.err{color:var(--red);font-size:13px;margin-top:6px;min-height:18px}
+.row2{display:flex;gap:10px;margin-top:10px}
+.btn{flex:1;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--text);font-weight:700;font-size:15px;cursor:pointer}
+.btn.go{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#2a1c00;border:0;flex:2}
+.ok{text-align:center;padding:10px 0}.ok .tick{font-size:54px}.ok h3{font-size:22px;margin:6px 0}.ok p{color:var(--mute);font-size:14px}
+.conf{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:9}
+.conf i{position:absolute;top:-10px;width:8px;height:12px;border-radius:2px;animation:fall 1.6s forwards}
+@keyframes fall{to{transform:translateY(800px) rotate(540deg);opacity:0}}
+/* side explainer */
+.side{flex:1;min-width:290px;max-width:420px}
+.side h3{font-size:18px;margin-bottom:10px}
+.pill{display:flex;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:9px;font-size:14px;line-height:1.45}
+.pill span{font-size:20px}
+.pill small{color:var(--mute);display:block}
+.sync{display:flex;align-items:center;gap:8px;color:var(--green);font-size:13px;margin-bottom:12px}
+.sync i{width:9px;height:9px;border-radius:50%;background:var(--green);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.25;transform:scale(1.6)}}
+/* admin + sheet */
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.stat{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stat small{color:var(--mute);font-size:12px}.stat b{display:block;font-size:26px;margin-top:2px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+th{color:var(--mute);font-size:12px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;background:var(--card)}
+.scroll{max-height:380px;overflow:auto;border-radius:12px;border:1px solid var(--line)}
+.tag{padding:3px 9px;border-radius:99px;font-size:12px;font-weight:700}
+.t-available{background:#ffffff14;color:var(--mute)}.t-reserved{background:#ff9f1c2a;color:#ffb85a}.t-paid{background:#2ee59d22;color:var(--green)}
+.mini{padding:5px 10px;border-radius:9px;border:1px solid var(--line);background:var(--bg2);color:var(--text);font-size:12px;cursor:pointer;margin-right:4px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.actions .btn{flex:none;padding:10px 14px;font-size:14px}
+.login{max-width:340px;margin:0 auto;text-align:center}
+.login input{margin:14px 0}
+.winner{position:fixed;inset:0;background:#000d;display:none;place-items:center;z-index:50;text-align:center}.winner.on{display:grid}
+.winner .w{font-size:130px;font-weight:900;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1}
+.winner h3{font-size:20px;color:var(--mute);margin-bottom:8px}.winner p{font-size:24px;margin:10px 0 20px}
+.sheetui{background:#fff;color:#202124;border-radius:10px;overflow:hidden;font-family:Arial,sans-serif;font-size:13px}
+.sheetui .bar1{background:#f1f3f4;padding:10px 14px;display:flex;gap:10px;align-items:center;border-bottom:1px solid #dadce0}
+.sheetui .bar1 b{color:#0f9d58;font-size:15px}
+.sheetui table td,.sheetui table th{border:1px solid #e1e3e6;padding:5px 9px;color:#202124;background:#fff;position:static}
+.sheetui table th{background:#f8f9fa;color:#5f6368;text-transform:none;letter-spacing:0;font-size:12px}
+.sheetui td.rn{background:#f8f9fa;color:#5f6368;text-align:center;width:36px}
+.sheetui .sc{max-height:360px;overflow:auto}
+.sheetui tr.flash td{animation:fl 1.6s}
+@keyframes fl{0%{background:#fff3b0}100%{background:#fff}}
+.sheetui .tabbar{background:#f1f3f4;padding:6px 14px;border-top:1px solid #dadce0;font-size:12px;color:#0f9d58;font-weight:700}
+.flow{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin:6px 0 18px}
+.node{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;font-weight:700;font-size:14px;text-align:center}
+.node small{display:block;color:var(--mute);font-weight:400;font-size:11px}
+.arrow{color:var(--gold);font-size:20px}
+@media(max-width:480px){.phone{border-width:6px;border-radius:32px;height:720px}}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>🎟️ RIFA WEBSITE — INTERACTIVE PREVIEW (demo data, nothing is saved)</h1>
+  <div class="tabs">
+    <button class="tab on" data-v="pub">📱 Customer page</button>
+    <button class="tab" data-v="adm">🛠️ Admin panel</button>
+    <button class="tab" data-v="sh">📗 Google Sheet</button>
+    <button class="tab" data-v="how">🔄 How it connects</button>
+  </div>
+</div>
+
+<!-- PUBLIC -->
+<div class="view on" id="pub">
+  <p class="note">This is what your customers see when you send them the link. <b>Try it:</b> tap a gold number, type a name, confirm — then check the <b>Google Sheet</b> tab to see the row appear.</p>
+  <div class="stage">
+    <div class="phone">
+      <div class="screen" id="screen">
+        <div class="hero">
+          <span class="badge">🎟️ OFFICIAL RAFFLE</span>
+          <h2>Grand Prize Raffle</h2>
+          <p>Pick your lucky number & win!</p>
+          <div class="facts">
+            <div class="fact"><small>PRIZE</small><b>$1,000</b></div>
+            <div class="fact"><small>PER NUMBER</small><b>$10</b></div>
+            <div class="fact"><small>DRAW DATE</small><b>Dec 24</b></div>
+          </div>
+        </div>
+        <div class="prog"><div class="row"><span id="pTxt">0/100 taken</span><span id="pPct">0%</span></div><div class="bar"><i id="pBar"></i></div></div>
+        <div class="tools"><input type="search" id="q" placeholder="🔍 Find a number…" inputmode="numeric"><button class="chip" id="onlyA">Available only</button></div>
+        <div class="legend"><span class="l-a">Available</span><span class="l-r">Reserved</span><span class="l-p">Taken</span></div>
+        <div class="grid" id="grid"></div>
+        <div class="steps"><h3>How it works</h3>
+          <div class="step"><b>1</b>Tap an available number</div>
+          <div class="step"><b>2</b>Type your name & confirm</div>
+          <div class="step"><b>3</b>Pay the organizer — you're in the draw!</div>
+        </div>
+        <div class="foot">Questions? Contact the organizer on WhatsApp<br>© Rifa</div>
+      </div>
+      <button class="cta" id="cta">🎯 Pick a number</button>
+      <div class="sheet" id="sheet"><div class="panel" id="panel"></div></div>
+      <div class="conf" id="conf"></div>
+    </div>
+    <div class="side">
+      <div class="sync"><i></i>Live sync — checks the sheet every ~10 seconds</div>
+      <h3>What makes it work for you</h3>
+      <div class="pill"><span>📱</span><div>Mobile-first<small>Built for people opening your link from WhatsApp. Big tap targets, fast loading.</small></div></div>
+      <div class="pill"><span>🔒</span><div>No double-booking<small>If two people pick the same number, only the first wins. The second gets a friendly message.</small></div></div>
+      <div class="pill"><span>🕶️</span><div>Privacy<small>Public sees masked names only ("Maria G."). Phones stay private.</small></div></div>
+      <div class="pill"><span>✨</span><div>Cool details<small>Glow on free numbers, confetti on success, progress bar, search, filter.</small></div></div>
+      <div class="pill"><span>🌎</span><div>Spanish / English<small>One-tap language toggle (ES default) in the real build.</small></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="view" id="adm">
+  <p class="note">Private page at <b>/admin</b> — password protected. Only you see names, phones and payment status. (Demo password: <b>1234</b>)</p>
+  <div class="card" id="login"><div class="login"><div style="font-size:42px">🔐</div><h3>Admin login</h3><input id="pw" type="password" placeholder="Password" style="width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:13px;color:var(--text);font-size:16px"><button class="btn go" style="width:100%" id="loginBtn">Enter</button><div class="err" id="loginErr"></div></div></div>
+  <div class="card" id="panelAdm" style="display:none">
+    <div class="stats">
+      <div class="stat"><small>Taken</small><b id="sT">0</b></div>
+      <div class="stat"><small>Paid</small><b id="sP" style="color:var(--green)">0</b></div>
+      <div class="stat"><small>Pending payment</small><b id="sR" style="color:#ffb85a">0</b></div>
+      <div class="stat"><small>Money collected</small><b id="sM" style="color:var(--gold)">$0</b></div>
+    </div>
+    <div class="actions">
+      <button class="btn go" id="drawBtn">🏆 Draw winner</button>
+      <button class="btn" id="csvBtn">⬇️ Export CSV</button>
+      <button class="btn" onclick="go('sh')">📗 Open Google Sheet</button>
+    </div>
+    <div class="scroll"><table><thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead><tbody id="aBody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- SHEET -->
+<div class="view" id="sh">
+  <p class="note">Your Google Sheet is the database. Anything a customer does appears here <b>instantly</b>. And if you edit it by hand (change a status, type a name), the website updates within ~10 seconds. <b>Try:</b> double-click a status cell below and change it, then go back to the Customer page.</p>
+  <div class="sheetui">
+    <div class="bar1"><b>▦ Rifa</b><span>File &nbsp; Edit &nbsp; View &nbsp; Insert &nbsp; Format &nbsp; Data</span></div>
+    <div class="sc"><table><thead><tr><th></th><th>A · number</th><th>B · name</th><th>C · phone</th><th>D · status</th><th>E · reserved_at</th></tr></thead><tbody id="sBody"></tbody></table></div>
+    <div class="tabbar">▣ Tickets</div>
+  </div>
+</div>
+
+<!-- HOW -->
+<div class="view" id="how">
+  <p class="note">How the pieces talk to each other:</p>
+  <div class="flow">
+    <div class="node">📱 Customer<small>opens your link</small></div><span class="arrow">⇄</span>
+    <div class="node">▲ Vercel<small>website + secure API</small></div><span class="arrow">⇄</span>
+    <div class="node">🔑 Google Sheets API<small>service account</small></div><span class="arrow">⇄</span>
+    <div class="node">📗 Your Google Sheet<small>the database</small></div>
+  </div>
+  <div class="stage" style="align-items:stretch">
+    <div class="side card"><h3>Customer picks a number</h3>
+      <div class="pill"><span>1️⃣</span>Website sends name + number to the server</div>
+      <div class="pill"><span>2️⃣</span>Server re-checks the row is still free</div>
+      <div class="pill"><span>3️⃣</span>Writes the name + "reserved" into the sheet</div>
+      <div class="pill"><span>4️⃣</span>Everyone else sees it as taken within seconds</div></div>
+    <div class="side card"><h3>You edit the sheet</h3>
+      <div class="pill"><span>1️⃣</span>Mark "paid", free a number, fix a name</div>
+      <div class="pill"><span>2️⃣</span>Website re-reads the sheet every ~10 seconds</div>
+      <div class="pill"><span>3️⃣</span>Grid, progress bar and admin update on their own</div></div>
+    <div class="side card"><h3>Safety built in</h3>
+      <div class="pill"><span>🔒</span>Google key lives only on the server</div>
+      <div class="pill"><span>🚫</span>Rate limit + bot trap against spam</div>
+      <div class="pill"><span>🛡️</span>Names cleaned so nobody can break your sheet</div>
+      <div class="pill"><span>🕶️</span>Public sees masked names only</div></div>
+  </div>
+</div>
+
+<div class="winner" id="winner"><div><h3>🏆 THE WINNING NUMBER IS</h3><div class="w" id="wNum">--</div><p id="wName"></p><button class="btn go" style="flex:none;padding:14px 30px" onclick="document.getElementById('winner').classList.remove('on')">Close</button></div></div>
+
+<script>
+const N=100,PRICE=10;
+const names=["Maria Gomez","Carlos Ruiz","Ana Lopez","Luis Diaz","Sofia Perez","Jorge Silva","Lucia Torres","Pedro Ramos","Elena Cruz","Diego Vega","Camila Rios","Mateo Soto"];
+const T=[];for(let i=1;i<=N;i++)T.push({n:i,name:"",phone:"",status:"available",at:""});
+[3,7,12,18,21,27,33,38,42,49,56,64,71,77,85].forEach((n,i)=>{const t=T[n-1];t.name=names[i%names.length];t.phone="+1 555 01"+(10+i);t.status=i%3===0?"reserved":"paid";t.at="2026-11-2"+(i%5)+" 1"+(i%9)+":2"+(i%6)});
+let sel=null,only=false,flash=null;
+const $=id=>document.getElementById(id);
+const mask=s=>{const p=s.trim().split(/\s+/);return p[0]+(p[1]?" "+p[1][0]+".":"")};
+const pad=n=>String(n).padStart(2,"0");
+function go(v){document.querySelectorAll(".view").forEach(e=>e.classList.toggle("on",e.id===v));document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.v===v))}
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>go(t.dataset.v));
+function render(){
+  const q=$("q").value.trim();
+  $("grid").innerHTML=T.filter(t=>(!only||t.status==="available")&&(!q||String(t.n).includes(q))).map(t=>{
+    const c=t.status==="available"?"a":t.status==="reserved"?"r":"p";
+    const lbl=t.status==="available"?"":`<em>${mask(t.name)}</em>`;
+    return `<button class="n ${c}${flash===t.n?" pop":""}" data-n="${t.n}" aria-label="Number ${t.n}, ${t.status}" ${c!=="a"?"disabled":""}>${pad(t.n)}${lbl}</button>`}).join("");
+  document.querySelectorAll(".n.a").forEach(b=>b.onclick=()=>openSheet(+b.dataset.n));
+  const taken=T.filter(t=>t.status!=="available").length;
+  $("pTxt").textContent=taken+"/"+N+" taken";$("pPct").textContent=Math.round(taken/N*100)+"%";$("pBar").style.width=taken/N*100+"%";
+  // admin
+  const paid=T.filter(t=>t.status==="paid").length,res=T.filter(t=>t.status==="reserved").length;
+  $("sT").textContent=taken;$("sP").textContent=paid;$("sR").textContent=res;$("sM").textContent="$"+paid*PRICE;
+  $("aBody").innerHTML=T.filter(t=>t.status!=="available").map(t=>`<tr><td><b>${pad(t.n)}</b></td><td>${esc(t.name)}</td><td>${esc(t.phone)||"—"}</td><td><span class="tag t-${t.status}">${t.status}</span></td><td>${t.status!=="paid"?`<button class="mini" onclick="setS(${t.n},'paid')">✅ Mark paid</button>`:""}<button class="mini" onclick="setS(${t.n},'available')">↩ Free</button></td></tr>`).join("")||`<tr><td colspan=5 style="color:var(--mute)">No tickets yet</td></tr>`;
+  // sheet
+  $("sBody").innerHTML=T.map((t,i)=>`<tr class="${flash===t.n?"flash":""}"><td class="rn">${i+2}</td><td>${t.n}</td><td>${esc(t.name)}</td><td>${esc(t.phone)}</td><td contenteditable data-n="${t.n}" class="st">${t.status}</td><td>${t.at}</td></tr>`).join("");
+  document.querySelectorAll("td.st").forEach(td=>td.onblur=()=>{const v=td.textContent.trim().toLowerCase();const t=T[td.dataset.n-1];if(["available","reserved","paid"].includes(v)&&v!==t.status){setS(t.n,v)}else td.textContent=t.status});
+  flash=null;
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function setS(n,s){const t=T[n-1];t.status=s;if(s==="available"){t.name="";t.phone="";t.at=""}flash=n;render()}
+function openSheet(n){
+  sel=n;$("sheet").classList.add("on");
+  $("panel").innerHTML=`<div style="text-align:center;color:var(--mute);font-size:13px">Your lucky number</div><div class="big">${pad(n)}</div>
+  <label>Your name *</label><input id="fName" placeholder="e.g. Maria Gomez" maxlength="40" autocomplete="off">
+  <label>Phone (optional)</label><input id="fPhone" placeholder="+1 555 000 0000" inputmode="tel">
+  <input type="text" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+  <div class="err" id="fErr"></div>
+  <div class="row2"><button class="btn" id="fCancel">Cancel</button><button class="btn go" id="fOk">Confirm · $${PRICE}</button></div>`;
+  $("fCancel").onclick=close;$("fOk").onclick=submit;setTimeout(()=>$("fName").focus(),50);
+}
+function close(){$("sheet").classList.remove("on")}
+function submit(){
+  const name=$("fName").value.trim();
+  if(name.length<2){$("fErr").textContent="Please enter your name (at least 2 letters).";return}
+  const t=T[sel-1];
+  if(t.status!=="available"){$("fErr").textContent="😕 Someone just took this number. Pick another!";return}
+  $("fOk").textContent="Saving…";$("fOk").disabled=true;
+  setTimeout(()=>{
+    t.name=name;t.phone=$("fPhone").value.trim();t.status="reserved";t.at=new Date().toISOString().slice(0,16).replace("T"," ");flash=sel;render();
+    $("panel").innerHTML=`<div class="ok"><div class="tick">🎉</div><h3>Number ${pad(sel)} is yours!</h3><p>Thanks ${esc(mask(name))}. Send your payment to the organizer to confirm your spot in the draw.</p></div><div class="row2"><button class="btn go" id="fDone">Done</button></div>`;
+    $("fDone").onclick=close;confetti();
+  },700);
+}
+function confetti(){const c=$("conf");const cols=["#ffc83d","#ff9f1c","#2ee59d","#5aa9ff","#ff5d73","#fff"];for(let i=0;i<60;i++){const e=document.createElement("i");e.style.left=Math.random()*100+"%";e.style.background=cols[i%cols.length];e.style.animationDelay=Math.random()*.4+"s";c.appendChild(e)}setTimeout(()=>c.innerHTML="",2400)}
+$("q").oninput=render;$("onlyA").onclick=()=>{only=!only;$("onlyA").classList.toggle("on",only);render()};
+$("cta").onclick=()=>{const a=T.filter(t=>t.status==="available");if(a.length)openSheet(a[Math.floor(Math.random()*a.length)].n)};
+$("sheet").onclick=e=>{if(e.target.id==="sheet")close()};
+$("loginBtn").onclick=()=>{if($("pw").value==="1234"){$("login").style.display="none";$("panelAdm").style.display="block"}else $("loginErr").textContent="Wrong password (demo: 1234)"};
+$("pw").onkeydown=e=>{if(e.key==="Enter")$("loginBtn").click()};
+$("csvBtn").onclick=()=>{const rows=["number,name,phone,status,reserved_at",...T.filter(t=>t.status!=="available").map(t=>[t.n,t.name,t.phone,t.status,t.at].map(v=>'"'+v+'"').join(","))];const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([rows.join("\n")],{type:"text/csv"}));a.download="raffle.csv";a.click()};
+$("drawBtn").onclick=()=>{const p=T.filter(t=>t.status==="paid");if(!p.length){alert("No paid tickets yet — mark some as paid first.");return}
+  $("winner").classList.add("on");$("wName").textContent="";let k=0;const iv=setInterval(()=>{$("wNum").textContent=pad(p[Math.floor(Math.random()*p.length)].n);if(++k>25){clearInterval(iv);const w=p[Math.floor(Math.random()*p.length)];$("wNum").textContent=pad(w.n);$("wName").textContent="🎉 "+w.name}},90)};
+render();
+</script>
+</body>
+</html>
